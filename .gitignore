@@ -1,0 +1,38 @@
+# Build output
+build/
+out/
+bin/
+
+# Third-party generated/downloaded artifacts
+external/
+
+# Native binaries and libraries
+*.exe
+*.dll
+*.lib
+*.a
+*.so
+*.dylib
+*.obj
+*.o
+*.pdb
+*.ilk
+*.exp
+
+# Visual Studio
+.vs/
+*.sln
+*.slnx
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Editors and OS metadata
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+imgui.ini
