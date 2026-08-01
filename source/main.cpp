@@ -1,14 +1,14 @@
 #include <cmath>
 #include <cstdio>
+#include <iostream>
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+
+#include "util/file_handler.h"
 
 namespace
 {
@@ -30,7 +30,6 @@ namespace
   {
       return reinterpret_cast<GLADapiproc>(glfwGetProcAddress(name));
   }
-
 }
 
 int main()
@@ -46,7 +45,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(kInitialWidth, kInitialHeight, "OpenGL Bootstrap", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(kInitialWidth, kInitialHeight, "Pac Man", nullptr, nullptr);
     if (window == nullptr)
     {
         glfwTerminate();
@@ -65,52 +64,68 @@ int main()
         return 1;
     }
 
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(kGlslVersion);
-
     const char* gl_version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
     glm::vec3 clear_color(0.08f, 0.11f, 0.14f);
+    
+    // CREATE SHADERS AND SHADER PROGRAM
+    const char *vertexShaderSource = PacmanUtil::ReadFile("assets/shaders/default.vert");
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+    const char *fragmentShaderSource = PacmanUtil::ReadFile("assets/shaders/default.frag");
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f,  0.5f, 0.0f
+    };  
+
+
+    // BIND THE VERTEX DATA 
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);  
+    glBindVertexArray(VAO);
+    
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);  
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);  
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
 
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
 
-        const float time = static_cast<float>(glfwGetTime());
-        const glm::mat4 transform = glm::rotate(glm::mat4(1.0f), time, glm::vec3(0.0f, 0.0f, 1.0f));
-        const float pulse = (std::sin(time) + 1.0f) * 0.5f;
-        const glm::vec4 animated = transform * glm::vec4(0.35f + pulse * 0.25f, 0.42f, 0.62f, 1.0f);
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("Debug");
-        ImGui::Text("OpenGL: %s", gl_version != nullptr ? gl_version : "unknown");
-        ImGui::Text("GLFW: %s", glfwGetVersionString());
-        ImGui::Text("GLM vec4: %.2f, %.2f, %.2f, %.2f", animated.x, animated.y, animated.z, animated.w);
-        ImGui::ColorEdit3("Clear color", glm::value_ptr(clear_color));
-        ImGui::Text("Frame time: %.3f ms", 1000.0f / io.Framerate);
-        ImGui::End();
-
-        ImGui::Render();
-
+        // render 
         glClearColor(clear_color.r, clear_color.g, clear_color.b, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        // draw our triangle
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
+    // cleanup 
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader); 
     glfwDestroyWindow(window);
     glfwTerminate();
 
