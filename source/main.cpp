@@ -10,6 +10,7 @@
 
 #include "utils/file_util.h"
 #include "core/texture.h"
+#include "core/shader.h"
 
 namespace
 {
@@ -79,36 +80,8 @@ int main()
     // const char* gl_version = reinterpret_cast<const char*>(glGetString(GL_VERSION));
     glm::vec4 clear_color(0.08f, 0.11f, 0.14f, 1.f);
     
-    // CREATE SHADERS AND SHADER PROGRAM
-    const char *vertexShaderSource = FileUtil::ReadFile("assets/shaders/default.vert");
-    unsigned int vertexShader;
-    int vertSuccess;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertSuccess);
-    if (!vertSuccess) {
-       std::cout << "Failed to vertex shader\n";
-       return 1;  
-    }
-
-    const char *fragmentShaderSource = FileUtil::ReadFile("assets/shaders/default.frag");
-    unsigned int fragmentShader;
-    int fragSuccess;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fragSuccess);
-    if (!fragSuccess) {
-       std::cout << "Failed to vertex shader\n";
-       return 1;  
-    }
-
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+    Shader* shader = new Shader("assets/shaders/default.vert", "assets/shaders/default.frag"); 
+    
     float scale = 0.5f; 
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
@@ -164,7 +137,7 @@ int main()
         
         // draw our triangle
         glBindTexture(GL_TEXTURE_2D, defaultTex->texture);
-        glUseProgram(shaderProgram);    
+        shader->Use();
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); 
         
@@ -173,8 +146,6 @@ int main()
     }
 
     // cleanup 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader); 
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glfwDestroyWindow(window);
