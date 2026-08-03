@@ -1,11 +1,13 @@
+#pragma once
 #include <string> 
 #include <fstream>
 #include <filesystem>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 
-namespace PacmanUtil { 
+namespace FileUtil { 
 
     static const char* ReadFile(const char* filePath) {
         // static ensures the string persists in memory after the function exits
