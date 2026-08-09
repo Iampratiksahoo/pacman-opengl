@@ -9,7 +9,7 @@ INCLUDE_DIR="${EXTERNAL_DIR}/include"
 LIB_DIR="${EXTERNAL_DIR}/lib"
 BUILD_DIR="${BUILD_DIR:-${PROJECT_ROOT}/build}"
 BINARY_NAME="${BINARY_NAME:-pacman-opengl}"
-MAIN_SOURCE="${MAIN_SOURCE:-${PROJECT_ROOT}/source/main.cpp}"
+SOURCE_DIR="${SOURCE_DIR:-${PROJECT_ROOT}/source}"
 
 usage() {
     echo "Usage: ./scripts/build.sh [--clean]"
@@ -106,7 +106,7 @@ if [[ "${clean_first}" == "true" ]]; then
 fi
 
 require_setup
-[[ -f "${MAIN_SOURCE}" ]] || die "main source not found: ${MAIN_SOURCE}"
+[[ -d "${SOURCE_DIR}" ]] || die "source directory not found: ${SOURCE_DIR}"
 
 PLATFORM="$(detect_platform)" || die "unsupported platform: $(uname -s)"
 if [[ "${PLATFORM}" == "windows" ]]; then
@@ -134,6 +134,15 @@ esac
 output="${BUILD_DIR}/${BINARY_NAME}${EXE_EXT}"
 mkdir -p -- "${BUILD_DIR}"
 
+source_files=()
+while IFS= read -r -d '' source_file; do
+    source_files+=("${source_file}")
+done < <(find "${SOURCE_DIR}" -type f -name '*.cpp' -print0 | sort -z)
+
+if (( ${#source_files[@]} == 0 )); then
+    die "no .cpp source files found under ${SOURCE_DIR}"
+fi
+
 extra_cxxflags=()
 extra_ldflags=()
 if [[ -n "${CXXFLAGS:-}" ]]; then
@@ -159,7 +168,7 @@ if (( ${#extra_cxxflags[@]} > 0 )); then
 fi
 
 build_cmd+=(
-    "${MAIN_SOURCE}"
+    "${source_files[@]}"
     "${LIB_DIR}/libimgui.a"
     "${LIB_DIR}/libglfw3.a"
     "${LIB_DIR}/libglad.a"

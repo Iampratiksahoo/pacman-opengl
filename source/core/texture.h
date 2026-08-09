@@ -1,21 +1,22 @@
+#pragma once
+
 #include <iostream> 
 #include "glad/gl.h"
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 
 class Texture {
 public:
-    int width; 
-    int height; 
-    int nrChannels;
-    uint texture; 
-    bool isValid; 
+    uint ID = -1; 
+    int width = -1; 
+    int height = -1; 
+    int nrChannels = -1;
+    bool isValid = false; 
     
 public: 
     Texture(const char* path) {
-        glGenTextures(1, &texture);  
-        glBindTexture(GL_TEXTURE_2D, texture);  
+        glGenTextures(1, &ID);  
+        glBindTexture(GL_TEXTURE_2D, ID);  
         // set the texture wrapping parameters
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -51,5 +52,9 @@ public:
         }
         isValid = data != nullptr; 
         stbi_image_free(data);
+    }
+
+    void Bind() {
+        glBindTexture(GL_TEXTURE_2D, ID);
     }
 };
