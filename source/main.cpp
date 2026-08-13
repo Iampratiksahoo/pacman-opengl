@@ -116,10 +116,8 @@ int main()
         glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        renderer.DrawSprite(
-            appleTexture, 
-            glm::vec2(400, 300)
-        );
+        renderer.position = glm::vec3(400, 300, 0); 
+        renderer.DrawSprite(appleTexture);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
