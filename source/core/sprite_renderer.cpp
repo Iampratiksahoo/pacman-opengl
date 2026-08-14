@@ -3,8 +3,8 @@
 #include <glm/trigonometric.hpp>         // For glm::radians
 #include <glm/gtc/matrix_transform.hpp>  // For glm::translate, glm::rotate, glm::scale
 
-SpriteRenderer::SpriteRenderer(Shader &shader)
-    : shader(shader)
+SpriteRenderer::SpriteRenderer(Shader& shader) :
+    shader(shader)
 {
     this->initRenderData();
 }
@@ -42,10 +42,10 @@ void SpriteRenderer::initRenderData()
     glBindVertexArray(0);
 }
 
-void SpriteRenderer::DrawSprite(Texture &texture, glm::vec2 size, float rotate, glm::vec3 color)
+void SpriteRenderer::Draw(Texture& texture)
 {
     // prepare transformations
-    this->shader.Use();
+    shader.Use();
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);  
 
@@ -55,13 +55,13 @@ void SpriteRenderer::DrawSprite(Texture &texture, glm::vec2 size, float rotate, 
 
     model = glm::scale(model, glm::vec3(size, 1.0f)); 
   
-    this->shader.SetMat4("model", model);
-    this->shader.SetVec3("spriteColor", color);
+    shader.SetMat4("model", model);
+    shader.SetVec3("spriteColor", color);
   
     glActiveTexture(GL_TEXTURE0);
     texture.Bind();
 
-    glBindVertexArray(this->quadVAO);
+    glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }  

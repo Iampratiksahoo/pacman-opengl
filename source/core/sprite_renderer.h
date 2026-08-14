@@ -9,6 +9,9 @@ class SpriteRenderer
 {
 public: 
     glm::vec3 position;
+    glm::vec2 size = glm::vec2(10.f, 10.f);
+    float rotate = 0.f; 
+    glm::vec3 color = glm::vec3(1.f); 
 
 private:
     Shader shader; 
@@ -18,11 +21,7 @@ public:
     SpriteRenderer(Shader &shader);
     ~SpriteRenderer();
 
-    void DrawSprite(
-        Texture &texture, 
-        glm::vec2 size = glm::vec2(10.0f, 10.0f), 
-        float rotate = 0.0f, 
-        glm::vec3 color = glm::vec3(1.0f));
+    void Draw(Texture& texture);
 
 private:
     void initRenderData();

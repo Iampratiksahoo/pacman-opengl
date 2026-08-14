@@ -11,6 +11,7 @@
 #include "utils/file_util.h"
 #include "core/texture.h"
 #include "core/shader.h"
+#include "core/asset_loader.h"
 #include "core/sprite_renderer.h"
 
 namespace
@@ -99,25 +100,13 @@ int main()
     defaultShader.SetInt("image", 0);
     defaultShader.SetMat4("projection", projection);
 
-    SpriteRenderer renderer(defaultShader);
-
-    Texture appleTexture("assets/sprites/other/apple.png"); 
-    if(!appleTexture.isValid) {
-        std::cout << "Failed to load texture\n";
-        return 1; 
-    }   
-
     while (!glfwWindowShouldClose(window)) {
-        
         // input 
         processInput(window); 
         
         // render 
         glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        renderer.position = glm::vec3(400, 300, 0); 
-        renderer.DrawSprite(appleTexture);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
