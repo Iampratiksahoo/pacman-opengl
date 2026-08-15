@@ -1,7 +1,16 @@
 # Build output
-build/
-out/
-bin/
+/build/
+/out/
+/bin/
+/bin-int/
+
+# Premake-generated project files
+Makefile
+*.make
+*.cbp
+*.workspace
+*.xcodeproj/
+compile_commands.json
 
 # Third-party generated/downloaded artifacts
 external/
@@ -36,3 +45,9 @@ external/
 Thumbs.db
 
 imgui.ini
+
+# Vendored build tools
+!/vendor/
+!/vendor/bin/
+!/vendor/bin/premake/
+!/vendor/bin/premake/**
