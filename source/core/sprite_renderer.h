@@ -15,7 +15,7 @@ public:
 
 private:
     Shader shader; 
-    uint quadVAO;
+    GLuint quadVAO;
 
 public:
     SpriteRenderer(Shader &shader);

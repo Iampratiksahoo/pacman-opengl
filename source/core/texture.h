@@ -7,7 +7,7 @@
 
 class Texture {
 public:
-    uint ID = -1; 
+    GLuint ID = -1;
     int width = -1; 
     int height = -1; 
     int nrChannels = -1;

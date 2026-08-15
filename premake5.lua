@@ -149,13 +149,15 @@ project "PacmanOpengl"
 
     files {
         "source/**.cpp",
-        "source/**.h"
+        "source/**.h",
+        "vendor/stb/**.h"
     }
 
     includedirs {
         "vendor/glad/include",
         "vendor/glfw/include",
         "vendor/glm",
+        "vendor/stb",
         "vendor/imgui",
         "vendor/imgui/backends"
     }

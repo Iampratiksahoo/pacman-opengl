@@ -11,29 +11,28 @@
 #include "utils/file_util.h"
 #include "core/texture.h"
 #include "core/shader.h"
-#include "core/asset_loader.h"
 #include "core/sprite_renderer.h"
 
 namespace
 {
-  constexpr int kInitialWidth = 1280;
-  constexpr int kInitialHeight = 720;
-  // constexpr const char* kGlslVersion = "#version 330";
+    constexpr int kInitialWidth = 1280;
+    constexpr int kInitialHeight = 720;
+    // constexpr const char* kGlslVersion = "#version 330";
 
-  void glfw_error_callback(int error, const char* description)
-  {
-      std::fprintf(stderr, "GLFW error %d: %s\n", error, description);
-  }
+    void glfw_error_callback(int error, const char* description)
+    {
+        std::fprintf(stderr, "GLFW error %d: %s\n", error, description);
+    }
 
-  void framebuffer_size_callback(GLFWwindow*, int width, int height)
-  {
-      glViewport(0, 0, width, height);
-  }
+    void framebuffer_size_callback(GLFWwindow*, int width, int height)
+    {
+        glViewport(0, 0, width, height);
+    }
 
-  GLADapiproc load_gl_function(const char* name)
-  {
-      return reinterpret_cast<GLADapiproc>(glfwGetProcAddress(name));
-  }
+    GLADapiproc load_gl_function(const char* name)
+    {
+        return reinterpret_cast<GLADapiproc>(glfwGetProcAddress(name));
+    }
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
