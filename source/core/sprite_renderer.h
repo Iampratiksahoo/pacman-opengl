@@ -8,6 +8,7 @@
 class SpriteRenderer
 {
 public: 
+    Texture& texture; 
     glm::vec3 position;
     glm::vec2 size = glm::vec2(10.f, 10.f);
     float rotate = 0.f; 
@@ -18,10 +19,10 @@ private:
     GLuint quadVAO;
 
 public:
-    SpriteRenderer(Shader &shader);
+    SpriteRenderer(Texture& texture, Shader &shader);
     ~SpriteRenderer();
 
-    void Draw(Texture& texture);
+    void Draw(float deltaTime);
 
 private:
     void initRenderData();

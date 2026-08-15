@@ -3,7 +3,8 @@
 #include <glm/trigonometric.hpp>         // For glm::radians
 #include <glm/gtc/matrix_transform.hpp>  // For glm::translate, glm::rotate, glm::scale
 
-SpriteRenderer::SpriteRenderer(Shader& shader) :
+SpriteRenderer::SpriteRenderer(Texture& texture, Shader& shader) :
+    texture(texture),
     shader(shader)
 {
     this->initRenderData();
@@ -42,12 +43,14 @@ void SpriteRenderer::initRenderData()
     glBindVertexArray(0);
 }
 
-void SpriteRenderer::Draw(Texture& texture)
+void SpriteRenderer::Draw(float deltaTime)
 {
     // prepare transformations
     shader.Use();
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, position);  
+
+    std::cout << size.x << ", " << size.y << "\n";
 
     model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f)); 
     model = glm::rotate(model, glm::radians(rotate), glm::vec3(0.0f, 0.0f, 1.0f)); 

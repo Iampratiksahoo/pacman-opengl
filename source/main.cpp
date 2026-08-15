@@ -11,28 +11,33 @@
 #include "utils/file_util.h"
 #include "core/texture.h"
 #include "core/shader.h"
+#include "core/asset_loader.h"
 #include "core/sprite_renderer.h"
 
 namespace
 {
-    constexpr int kInitialWidth = 1280;
-    constexpr int kInitialHeight = 720;
-    // constexpr const char* kGlslVersion = "#version 330";
+  constexpr int kInitialWidth = 1280;
+  constexpr int kInitialHeight = 720;
 
-    void glfw_error_callback(int error, const char* description)
-    {
-        std::fprintf(stderr, "GLFW error %d: %s\n", error, description);
-    }
+  float deltaTime = 0.0f; // Time between current frame and last frame
+  float lastFrame = 0.0f; // Time of last frame
 
-    void framebuffer_size_callback(GLFWwindow*, int width, int height)
-    {
-        glViewport(0, 0, width, height);
-    }
+  // constexpr const char* kGlslVersion = "#version 330";
 
-    GLADapiproc load_gl_function(const char* name)
-    {
-        return reinterpret_cast<GLADapiproc>(glfwGetProcAddress(name));
-    }
+  void glfw_error_callback(int error, const char* description)
+  {
+      std::fprintf(stderr, "GLFW error %d: %s\n", error, description);
+  }
+
+  void framebuffer_size_callback(GLFWwindow*, int width, int height)
+  {
+      glViewport(0, 0, width, height);
+  }
+
+  GLADapiproc load_gl_function(const char* name)
+  {
+      return reinterpret_cast<GLADapiproc>(glfwGetProcAddress(name));
+  }
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
@@ -98,20 +103,45 @@ int main()
     defaultShader.Use();
     defaultShader.SetInt("image", 0);
     defaultShader.SetMat4("projection", projection);
+    
+    AssetLoader assetLoader;
+
+    int i = 0;
+    SpriteRenderer renderer(assetLoader.textures[i], defaultShader);
+    renderer.position = glm::vec3(400, 300, 0); 
+
+    // stores all the renderers in the game 
+    std::vector<SpriteRenderer> renderers;
+    renderers.push_back(renderer);
 
     while (!glfwWindowShouldClose(window)) {
+
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            renderer.texture = assetLoader.textures[++i];
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            renderers[0].size += 10.f * deltaTime;
+
         // input 
         processInput(window); 
         
         // render 
         glClearColor(clear_color.r, clear_color.g, clear_color.b, clear_color.a);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        for (SpriteRenderer& renderer : renderers) {
+            renderer.Draw(deltaTime); 
+        }
         
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     // cleanup 
+    renderers.clear(); 
     glfwDestroyWindow(window);
     glfwTerminate();
 
